@@ -10,3 +10,9 @@
 - Config/session/peer cache live under `~/.config/tmgc/profiles/<profile>/`.
 - Never commit credentials, session files, or QR PNGs.
 - Do not log passwords or tokens.
+
+## Release rules (go-semantic-release)
+- feat: → minor
+- fix: → patch
+- feat!: or BREAKING CHANGE: → major
+- chore: etc → no release
