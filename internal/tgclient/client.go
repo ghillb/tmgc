@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/gotd/td/session"
 	"github.com/gotd/td/telegram"
 	"github.com/gotd/td/telegram/peers"
 	"github.com/gotd/td/tg"
@@ -42,8 +41,9 @@ func (f *Factory) Run(ctx context.Context, needsAuth bool, fn func(ctx context.C
 	dispatcher := tg.NewUpdateDispatcher()
 	dispatcherPtr := &dispatcher
 
+	sessionStorage := NewSessionStorage(f.Config, f.Paths, f.Printer)
 	client := telegram.NewClient(f.Config.APIID, f.Config.APIHash, telegram.Options{
-		SessionStorage: &session.FileStorage{Path: f.Paths.SessionPath},
+		SessionStorage: sessionStorage,
 		UpdateHandler:  dispatcherPtr,
 	})
 

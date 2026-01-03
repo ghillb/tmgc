@@ -11,11 +11,13 @@ import (
 const (
 	envAPIID   = "TMGC_API_ID"
 	envAPIHash = "TMGC_API_HASH"
+	envStore   = "TMGC_SESSION_STORE"
 )
 
 type Config struct {
-	APIID   int    `json:"api_id"`
-	APIHash string `json:"api_hash"`
+	APIID        int    `json:"api_id"`
+	APIHash      string `json:"api_hash"`
+	SessionStore string `json:"session_store"`
 }
 
 func Load(path string) (Config, error) {
@@ -60,6 +62,9 @@ func (c *Config) ApplyEnv() error {
 	}
 	if v := os.Getenv(envAPIHash); v != "" {
 		c.APIHash = v
+	}
+	if v := os.Getenv(envStore); v != "" {
+		c.SessionStore = v
 	}
 	return nil
 }

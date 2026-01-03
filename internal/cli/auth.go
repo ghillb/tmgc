@@ -137,10 +137,21 @@ type qrRenderOptions struct {
 func loginQR(ctx context.Context, rt *Runtime, b *tgclient.Bundle, opts qrRenderOptions) error {
 	loggedIn := qrlogin.OnLoginToken(b.Dispatcher)
 	qr := b.Client.QR()
+	var lastURL string
+	var headerPrinted bool
 
 	show := func(ctx context.Context, token qrlogin.Token) error {
 		url := token.URL()
-		rt.Printer.Logln("Scan this QR in Telegram (Settings -> Devices -> Link Desktop Device):")
+		if url == lastURL {
+			return nil
+		}
+		lastURL = url
+		if !headerPrinted {
+			rt.Printer.Logln("Scan this QR in Telegram (Settings -> Devices -> Link Desktop Device):")
+			headerPrinted = true
+		} else {
+			rt.Printer.Logln("QR rotated:")
+		}
 		if err := printASCIIQR(rt, url, opts); err != nil {
 			rt.Printer.Logln(url)
 		}
@@ -321,8 +332,7 @@ func newAuthLogoutCmd() *cobra.Command {
 			factory := tgclient.NewFactory(*rt.Config, rt.Paths, rt.Printer, rt.Timeout)
 			return factory.Run(cmd.Context(), false, func(ctx context.Context, b *tgclient.Bundle) error {
 				_, _ = b.Client.API().AuthLogOut(ctx)
-				_ = os.Remove(rt.Paths.SessionPath)
-				_ = os.Remove(rt.Paths.PeersPath)
+				tgclient.ClearSession(*rt.Config, rt.Paths, rt.Printer)
 				return nil
 			})
 		},
@@ -373,8 +383,7 @@ func printAuthStatus(ctx context.Context, rt *Runtime, b *tgclient.Bundle) error
 
 func cleanupLoginFailure(ctx context.Context, rt *Runtime, b *tgclient.Bundle) {
 	_, _ = b.Client.API().AuthLogOut(ctx)
-	_ = os.Remove(rt.Paths.SessionPath)
-	_ = os.Remove(rt.Paths.PeersPath)
+	tgclient.ClearSession(*rt.Config, rt.Paths, rt.Printer)
 }
 
 func newAuthConfigCmd() *cobra.Command {
@@ -391,8 +400,9 @@ func newAuthConfigCmd() *cobra.Command {
 
 func newAuthConfigSetCmd() *cobra.Command {
 	var (
-		apiID   int
-		apiHash string
+		apiID        int
+		apiHash      string
+		sessionStore string
 	)
 
 	cmd := &cobra.Command{
@@ -404,8 +414,8 @@ func newAuthConfigSetCmd() *cobra.Command {
 				return err
 			}
 
-			if apiID == 0 && apiHash == "" {
-				return errors.New("provide --api-id and/or --api-hash")
+			if apiID == 0 && apiHash == "" && sessionStore == "" {
+				return errors.New("provide --api-id, --api-hash, and/or --session-store")
 			}
 
 			cfg := *rt.Config
@@ -414,6 +424,13 @@ func newAuthConfigSetCmd() *cobra.Command {
 			}
 			if apiHash != "" {
 				cfg.APIHash = apiHash
+			}
+			if sessionStore != "" {
+				normalized, err := normalizeSessionStoreInput(sessionStore)
+				if err != nil {
+					return err
+				}
+				cfg.SessionStore = normalized
 			}
 
 			if err := config.Save(rt.Paths.ConfigPath, cfg); err != nil {
@@ -425,12 +442,13 @@ func newAuthConfigSetCmd() *cobra.Command {
 			case "json":
 				return rt.Printer.JSON(cfg)
 			case "plain":
-				line := fmt.Sprintf("%d\t%s", cfg.APIID, cfg.APIHash)
+				line := fmt.Sprintf("%d\t%s\t%s", cfg.APIID, cfg.APIHash, displaySessionStore(cfg.SessionStore))
 				rt.Printer.Plain([]string{line})
 			default:
-				rt.Printer.Table([][]string{{"API_ID", "API_HASH"}, {
+				rt.Printer.Table([][]string{{"API_ID", "API_HASH", "SESSION_STORE"}, {
 					strconv.Itoa(cfg.APIID),
 					maskHash(cfg.APIHash),
+					displaySessionStore(cfg.SessionStore),
 				}})
 			}
 			return nil
@@ -439,6 +457,7 @@ func newAuthConfigSetCmd() *cobra.Command {
 
 	cmd.Flags().IntVar(&apiID, "api-id", 0, "telegram api id")
 	cmd.Flags().StringVar(&apiHash, "api-hash", "", "telegram api hash")
+	cmd.Flags().StringVar(&sessionStore, "session-store", "", "session storage: keyring or file")
 
 	return cmd
 }
@@ -458,12 +477,13 @@ func newAuthConfigShowCmd() *cobra.Command {
 			case "json":
 				return rt.Printer.JSON(cfg)
 			case "plain":
-				line := fmt.Sprintf("%d\t%s", cfg.APIID, cfg.APIHash)
+				line := fmt.Sprintf("%d\t%s\t%s", cfg.APIID, cfg.APIHash, displaySessionStore(cfg.SessionStore))
 				rt.Printer.Plain([]string{line})
 			default:
-				rt.Printer.Table([][]string{{"API_ID", "API_HASH"}, {
+				rt.Printer.Table([][]string{{"API_ID", "API_HASH", "SESSION_STORE"}, {
 					strconv.Itoa(cfg.APIID),
 					maskHash(cfg.APIHash),
+					displaySessionStore(cfg.SessionStore),
 				}})
 			}
 			return nil
@@ -480,6 +500,23 @@ func maskHash(hash string) string {
 		return "******"
 	}
 	return hash[:2] + strings.Repeat("*", len(hash)-4) + hash[len(hash)-2:]
+}
+
+func normalizeSessionStoreInput(store string) (string, error) {
+	store = strings.TrimSpace(strings.ToLower(store))
+	switch store {
+	case "keyring", "file":
+		return store, nil
+	default:
+		return "", fmt.Errorf("invalid session store %q (use keyring or file)", store)
+	}
+}
+
+func displaySessionStore(store string) string {
+	if strings.TrimSpace(store) == "" {
+		return "default"
+	}
+	return store
 }
 
 func printASCIIQR(rt *Runtime, url string, opts qrRenderOptions) error {
