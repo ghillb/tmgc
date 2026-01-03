@@ -33,6 +33,11 @@ jobs:
         run: |
           rm -f .generated-go-semantic-release-changelog.md
           rm -rf .semrel
+      - name: Checkout release tag
+        if: steps.semrel.outputs.version != ''
+        run: |
+          git fetch --tags
+          git checkout "v${{ steps.semrel.outputs.version }}"
       - name: Run GoReleaser
         if: steps.semrel.outputs.version != ''
         uses: goreleaser/goreleaser-action@v6
