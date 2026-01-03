@@ -24,11 +24,12 @@ Environment overrides:
 
 - `TMGC_API_ID`
 - `TMGC_API_HASH`
+- `TMGC_SESSION_STORE` (`keyring` or `file`)
 
 Config storage:
 
 - Config: `~/.config/tmgc/profiles/<profile>/config.json`
-- Session: `~/.config/tmgc/profiles/<profile>/session.json`
+- Session: stored in OS keychain when available (default). If keychain is unavailable or `session_store=file`, fall back to `~/.config/tmgc/profiles/<profile>/session.json` (unencrypted).
 - Peer cache: `~/.config/tmgc/profiles/<profile>/peers.json`
 
 ## Output
