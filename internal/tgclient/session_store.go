@@ -78,6 +78,7 @@ func (k *keyringStorage) StoreSession(_ context.Context, data []byte) error {
 func openKeyring() (keyring.Keyring, error) {
 	return keyring.Open(keyring.Config{
 		ServiceName: "tmgc",
+		LibSecretCollectionName: "login",
 		AllowedBackends: []keyring.BackendType{
 			keyring.KeychainBackend,
 			keyring.WinCredBackend,
