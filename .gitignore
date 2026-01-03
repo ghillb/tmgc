@@ -1,0 +1,10 @@
+# Binaries
+tmgc
+/bin/
+/dist/
+
+# Local config
+*.log
+
+# OS
+.DS_Store
