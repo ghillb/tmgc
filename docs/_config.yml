@@ -1,0 +1,29 @@
+title: "tmgc"
+tagline: "Telegram MTProto Go CLI"
+description: "Script-first Telegram CLI built on gotd/td."
+url: "https://ghillb.github.io"
+baseurl: "/tmgc"
+markdown: kramdown
+highlighter: rouge
+
+plugins:
+  - jekyll-seo-tag
+  - jekyll-sitemap
+
+defaults:
+  - scope:
+      path: ""
+    values:
+      layout: default
+
+nav:
+  - title: "Get Started"
+    url: "/getting-started.html"
+  - title: "Commands"
+    url: "/commands.html"
+  - title: "Config"
+    url: "/config.html"
+  - title: "Spec"
+    url: "/spec.html"
+  - title: "GitHub"
+    url: "https://github.com/ghillb/tmgc"

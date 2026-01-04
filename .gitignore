@@ -2,6 +2,8 @@
 tmgc
 /bin/
 /dist/
+/docs/_site/
+/docs/.jekyll-cache/
 
 # Local config
 *.log

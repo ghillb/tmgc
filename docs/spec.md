@@ -1,3 +1,8 @@
+---
+title: CLI Spec
+hide_title: true
+---
+
 # tmgc CLI spec (v0)
 
 This spec defines the CLI surface, output contract, and minimal behavior. It favors

@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#0f172a">
+    {% seo %}
+    <link rel="stylesheet" href="{{ '/assets/site.css' | relative_url }}">
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="shell">
+        <a class="logo" href="{{ '/' | relative_url }}">tmgc</a>
+        <div class="nav-group">
+          <nav class="site-nav">
+            {% for item in site.nav %}
+            <a href="{{ item.url | relative_url }}">{{ item.title }}</a>
+            {% endfor %}
+          </nav>
+          <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Toggle theme">
+            Theme
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main class="site-main">
+      <div class="shell">
+        <article class="page">
+          {% unless page.hide_title %}
+          {% if page.title %}
+          <h1>{{ page.title }}</h1>
+          {% endif %}
+          {% endunless %}
+          {{ content }}
+        </article>
+      </div>
+    </main>
+
+    <footer class="site-footer">
+      <div class="shell">
+        <div class="footer-left">
+          <strong>tmgc</strong> · Telegram MTProto Go CLI
+        </div>
+        <div class="footer-right">
+          <a href="https://github.com/ghillb/tmgc">GitHub</a>
+        </div>
+      </div>
+    </footer>
+    <script>
+      (function () {
+        const root = document.documentElement;
+        const stored = localStorage.getItem("theme");
+        const prefersDark =
+          window.matchMedia &&
+          window.matchMedia("(prefers-color-scheme: dark)").matches;
+        if (stored) {
+          root.dataset.theme = stored;
+        } else if (prefersDark) {
+          root.dataset.theme = "dark";
+        }
+
+        function updateButton() {
+          const btn = document.getElementById("theme-toggle");
+          if (!btn) return;
+          const isDark = root.dataset.theme === "dark";
+          btn.textContent = isDark ? "Light" : "Dark";
+          btn.setAttribute("aria-pressed", String(isDark));
+        }
+
+        window.addEventListener("DOMContentLoaded", function () {
+          const btn = document.getElementById("theme-toggle");
+          if (!btn) return;
+          btn.addEventListener("click", function () {
+            const isDark = root.dataset.theme === "dark";
+            root.dataset.theme = isDark ? "light" : "dark";
+            localStorage.setItem("theme", root.dataset.theme);
+            updateButton();
+          });
+          updateButton();
+        });
+      })();
+    </script>
+  </body>
+</html>
