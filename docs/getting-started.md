@@ -41,6 +41,7 @@ tmgc auth login --qr-file /tmp/tmgc.png
 tmgc chat list --limit 20
 tmgc chat history <chat_id> --limit 30
 tmgc message send @username "hello"
+tmgc message send @username --file ./photo.jpg --caption "hi"
 ```
 
 ## Output modes

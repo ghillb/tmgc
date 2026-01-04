@@ -23,7 +23,8 @@ title: Commands
 
 | Command | Notes |
 | --- | --- |
-| `message send <peer> <text>` | Send a message to a chat or username. |
+| `message send <peer> <text>` | Send a text message. |
+| `message send <peer> --file <path> [--caption "text"]` | Upload media or document (auto-detected). |
 
 ## Search
 

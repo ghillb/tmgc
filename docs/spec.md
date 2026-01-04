@@ -128,6 +128,7 @@ Output (JSON):
 
 ```
 tmgc message send <peer> <text> [--reply <id>] [--silent]
+tmgc message send <peer> --file <path> [--caption "text"] [--reply <id>] [--silent]
 ```
 
 Output (JSON):
@@ -154,7 +155,7 @@ v0 is scoped to:
 
 - Auth (QR + code), status, logout
 - Chat list + history
-- Send text messages
+- Send text messages and files (auto-detect media vs document)
 - Search messages (global or per chat)
 
 Non-goals for v0:

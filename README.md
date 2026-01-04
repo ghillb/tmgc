@@ -7,7 +7,7 @@ Features:
 - Auth: `auth login` (QR + PNG fallback), `auth status`, `auth logout`
 - Credentials: `auth config set/show`
 - Chat: `chat list`, `chat history`
-- Messaging: `message send`
+- Messaging: `message send` (text or `--file`)
 - Search: `search messages` (global or per chat)
 - Output: human, `--plain` (TSV), `--json`
 - Session storage: OS keychain by default, fallback to file
@@ -26,6 +26,7 @@ tmgc auth login
 tmgc auth login --qr-file /tmp/tmgc.png
 tmgc chat list --limit 20
 tmgc message send @username "hello"
+tmgc message send @username --file ./photo.jpg --caption "hi"
 ```
 
 Env vars are only needed if you skip `auth config set`:
