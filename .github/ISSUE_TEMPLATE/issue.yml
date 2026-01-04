@@ -1,0 +1,41 @@
+name: Issue
+description: Report a bug or request a feature
+labels:
+  - triage
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What happened or what do you want?
+      placeholder: Briefly describe the issue or request.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps / context
+      description: Repro steps or context.
+      placeholder: |
+        1. ...
+        2. ...
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected
+      description: What did you expect?
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual
+      description: What actually happened?
+  - type: input
+    id: version
+    attributes:
+      label: tmgc version
+      placeholder: tmgc version
+  - type: input
+    id: os
+    attributes:
+      label: OS
+      placeholder: e.g. macOS 14, Ubuntu 24.04, Windows 11

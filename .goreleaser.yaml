@@ -5,6 +5,8 @@ builds:
   - id: tmgc
     main: ./cmd/tmgc
     binary: tmgc
+    ldflags:
+      - -s -w -X main.version={{ .Version }}
     env:
       - CGO_ENABLED=0
     goos:
