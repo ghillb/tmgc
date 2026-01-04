@@ -5,6 +5,7 @@
 - Build: `go build -o ./dist/tmgc ./cmd/tmgc`
 - Test: `go test ./...`
 - Format: `gofmt -w $(rg --files -g '*.go')`
+- Contributing guide: `CONTRIBUTING.md`
 
 ## Storage and secrets
 - Config/session/peer cache live under `~/.config/tmgc/profiles/<profile>/`.
@@ -16,3 +17,6 @@
 - fix: → patch
 - feat!: or BREAKING CHANGE: → major
 - chore: etc → no release
+
+## Docs updates
+- Update `docs/` (GitHub Pages) whenever a user-facing feature changes.
