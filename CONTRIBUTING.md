@@ -24,3 +24,7 @@ This project publishes GitHub Pages from `docs/`.
 
 When adding or changing user-facing features, update the relevant docs
 (`docs/` pages and `docs/spec.md`) in the same PR.
+
+## Tests
+
+Prefer lightweight unit tests for pure logic; no Telegram integration tests yet. Add tests when adding features or fixing bugs.
