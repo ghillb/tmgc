@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"time"
 
@@ -33,10 +34,11 @@ func newMessageCmd() *cobra.Command {
 
 func newMessageSendCmd() *cobra.Command {
 	var (
-		replyID int
-		silent  bool
-		file    string
-		caption string
+		replyID  int
+		silent   bool
+		file     string
+		caption  string
+		schedule string
 	)
 
 	cmd := &cobra.Command{
@@ -69,6 +71,17 @@ func newMessageSendCmd() *cobra.Command {
 			if file != "" && caption != "" {
 				text = caption
 			}
+			var scheduleDate int
+			if schedule != "" {
+				value, err := parseSchedule(schedule)
+				if err != nil {
+					return err
+				}
+				if value <= int(time.Now().Unix()) {
+					return fmt.Errorf("schedule time must be in the future")
+				}
+				scheduleDate = value
+			}
 
 			factory := tgclient.NewFactory(*rt.Config, rt.Paths, rt.Printer, rt.Timeout)
 			return factory.Run(cmd.Context(), true, func(ctx context.Context, b *tgclient.Bundle) error {
@@ -84,6 +97,9 @@ func newMessageSendCmd() *cobra.Command {
 						Message:  text,
 						RandomID: rand.Int63(),
 						Silent:   silent,
+					}
+					if scheduleDate != 0 {
+						req.ScheduleDate = scheduleDate
 					}
 					if replyID != 0 {
 						req.ReplyTo = &tg.InputReplyToMessage{ReplyToMsgID: replyID}
@@ -105,6 +121,9 @@ func newMessageSendCmd() *cobra.Command {
 						Message:  text,
 						RandomID: rand.Int63(),
 						Silent:   silent,
+					}
+					if scheduleDate != 0 {
+						req.ScheduleDate = scheduleDate
 					}
 					if replyID != 0 {
 						req.ReplyTo = &tg.InputReplyToMessage{ReplyToMsgID: replyID}
@@ -142,7 +161,28 @@ func newMessageSendCmd() *cobra.Command {
 	cmd.Flags().BoolVar(&silent, "silent", false, "send silently")
 	cmd.Flags().StringVar(&file, "file", "", "path to file to upload")
 	cmd.Flags().StringVar(&caption, "caption", "", "caption for uploaded media")
+	cmd.Flags().StringVar(&schedule, "schedule", "", "schedule time (RFC3339 or unix seconds)")
 	return cmd
+}
+
+func parseSchedule(value string) (int, error) {
+	value = strings.TrimSpace(value)
+	if value == "" {
+		return 0, fmt.Errorf("schedule value is empty")
+	}
+	if unix, err := strconv.ParseInt(value, 10, 64); err == nil {
+		if unix > 1_000_000_000_000 {
+			unix = unix / 1000
+		}
+		return int(unix), nil
+	}
+	if t, err := time.Parse(time.RFC3339, value); err == nil {
+		return int(t.Unix()), nil
+	}
+	if t, err := time.Parse(time.RFC3339Nano, value); err == nil {
+		return int(t.Unix()), nil
+	}
+	return 0, fmt.Errorf("invalid schedule time: use RFC3339 or unix seconds")
 }
 
 func uploadMedia(ctx context.Context, api *tg.Client, path string) (tg.InputMediaClass, error) {

@@ -27,6 +27,7 @@ tmgc auth login --qr-file /tmp/tmgc.png
 tmgc chat list --limit 20
 tmgc message send @username "hello"
 tmgc message send @username --file ./photo.jpg --caption "hi"
+tmgc message send @username "later" --schedule 2026-01-05T09:30:00Z
 ```
 
 Env vars are only needed if you skip `auth config set`:
