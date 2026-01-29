@@ -129,6 +129,7 @@ Output (JSON):
 ```
 tmgc message send <peer> <text> [--reply <id>] [--silent]
 tmgc message send <peer> --file <path> [--caption "text"] [--reply <id>] [--silent]
+tmgc message send <peer> --file <path> --voice [--reply <id>] [--silent]
 tmgc message send <peer> ... --schedule <when>
 ```
 

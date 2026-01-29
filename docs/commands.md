@@ -25,6 +25,7 @@ title: Commands
 | --- | --- |
 | `message send <peer> <text>` | Send a text message. |
 | `message send <peer> --file <path> [--caption "text"]` | Upload media or document (auto-detected). |
+| `message send <peer> --file <path> --voice` | Send a voice note (audio/ogg opus recommended). |
 | `message send <peer> ... --schedule <when>` | Schedule a message (RFC3339 or unix seconds). |
 
 ## Search

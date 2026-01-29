@@ -27,6 +27,7 @@ tmgc auth login --qr-file /tmp/tmgc.png
 tmgc chat list --limit 20
 tmgc message send @username "hello"
 tmgc message send @username --file ./photo.jpg --caption "hi"
+tmgc message send @username --file ./voice.ogg --voice
 tmgc message send @username "later" --schedule 2026-01-05T09:30:00Z
 ```
 

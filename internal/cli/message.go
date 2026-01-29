@@ -38,6 +38,7 @@ func newMessageSendCmd() *cobra.Command {
 		silent   bool
 		file     string
 		caption  string
+		voice    bool
 		schedule string
 	)
 
@@ -47,6 +48,9 @@ func newMessageSendCmd() *cobra.Command {
 		Args: func(cmd *cobra.Command, args []string) error {
 			if len(args) < 1 {
 				return fmt.Errorf("peer is required")
+			}
+			if voice && file == "" {
+				return fmt.Errorf("--voice requires --file")
 			}
 			if file == "" && len(args) < 2 {
 				return fmt.Errorf("message text cannot be empty")
@@ -110,7 +114,7 @@ func newMessageSendCmd() *cobra.Command {
 						return err
 					}
 				} else {
-					media, err := uploadMedia(ctx, b.Client.API(), file)
+					media, err := uploadMedia(ctx, b.Client.API(), file, uploadOptions{AsVoice: voice})
 					if err != nil {
 						return err
 					}
@@ -161,6 +165,7 @@ func newMessageSendCmd() *cobra.Command {
 	cmd.Flags().BoolVar(&silent, "silent", false, "send silently")
 	cmd.Flags().StringVar(&file, "file", "", "path to file to upload")
 	cmd.Flags().StringVar(&caption, "caption", "", "caption for uploaded media")
+	cmd.Flags().BoolVar(&voice, "voice", false, "send file as voice note (audio/ogg opus recommended)")
 	cmd.Flags().StringVar(&schedule, "schedule", "", "schedule time (RFC3339 or unix seconds)")
 	return cmd
 }
@@ -185,7 +190,11 @@ func parseSchedule(value string) (int, error) {
 	return 0, fmt.Errorf("invalid schedule time: use RFC3339 or unix seconds")
 }
 
-func uploadMedia(ctx context.Context, api *tg.Client, path string) (tg.InputMediaClass, error) {
+type uploadOptions struct {
+	AsVoice bool
+}
+
+func uploadMedia(ctx context.Context, api *tg.Client, path string, opts uploadOptions) (tg.InputMediaClass, error) {
 	file, err := os.Open(path)
 	if err != nil {
 		return nil, err
@@ -200,12 +209,27 @@ func uploadMedia(ctx context.Context, api *tg.Client, path string) (tg.InputMedi
 		return nil, fmt.Errorf("path is a directory: %s", path)
 	}
 
+	ext := strings.ToLower(filepath.Ext(info.Name()))
 	mimeType, isPhoto, err := detectMedia(file, info.Name())
 	if err != nil {
 		return nil, err
 	}
 	if mimeType == "" {
 		mimeType = "application/octet-stream"
+	}
+	if opts.AsVoice {
+		if isPhoto {
+			return nil, fmt.Errorf("voice notes require audio files: %s", path)
+		}
+		if !isLikelyVoiceMedia(mimeType, ext) {
+			return nil, fmt.Errorf("voice notes require audio files (ogg/opus recommended): %s", path)
+		}
+		if mimeType == "application/octet-stream" && (ext == ".ogg" || ext == ".opus" || ext == ".oga") {
+			mimeType = "audio/ogg"
+		}
+		if mimeType == "application/ogg" {
+			mimeType = "audio/ogg"
+		}
 	}
 
 	upload := uploader.NewUpload(info.Name(), file, info.Size())
@@ -222,6 +246,15 @@ func uploadMedia(ctx context.Context, api *tg.Client, path string) (tg.InputMedi
 	attrs := []tg.DocumentAttributeClass{
 		&tg.DocumentAttributeFilename{FileName: info.Name()},
 	}
+	if opts.AsVoice {
+		attrs = append(attrs, &tg.DocumentAttributeAudio{Duration: 0, Voice: true})
+		media := &tg.InputMediaUploadedDocument{
+			File:       inputFile,
+			MimeType:   mimeType,
+			Attributes: attrs,
+		}
+		return media, nil
+	}
 	media := &tg.InputMediaUploadedDocument{
 		File:       inputFile,
 		MimeType:   mimeType,
@@ -229,6 +262,21 @@ func uploadMedia(ctx context.Context, api *tg.Client, path string) (tg.InputMedi
 		ForceFile:  true,
 	}
 	return media, nil
+}
+
+func isLikelyVoiceMedia(mimeType, ext string) bool {
+	if strings.HasPrefix(mimeType, "audio/") {
+		return true
+	}
+	if mimeType == "application/ogg" {
+		return true
+	}
+	switch ext {
+	case ".ogg", ".opus", ".oga", ".mp3", ".m4a", ".aac", ".wav", ".flac":
+		return true
+	default:
+		return false
+	}
 }
 
 func detectMedia(file *os.File, name string) (string, bool, error) {
