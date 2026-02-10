@@ -21,6 +21,12 @@ type ChatListItem struct {
 	Pinned        bool   `json:"pinned"`
 }
 
+type ContactSearchItem struct {
+	DisplayName string `json:"display_name"`
+	Username    string `json:"username,omitempty"`
+	User        string `json:"user"`
+}
+
 type MessageItem struct {
 	ID         int       `json:"id"`
 	Date       time.Time `json:"date"`

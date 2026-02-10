@@ -92,6 +92,7 @@ func newRootCmd() *cobra.Command {
 
 	cmd.AddCommand(newAuthCmd())
 	cmd.AddCommand(newChatCmd())
+	cmd.AddCommand(newContactCmd())
 	cmd.AddCommand(newMessageCmd())
 	cmd.AddCommand(newSearchCmd())
 
