@@ -2,8 +2,6 @@ module github.com/ghillb/tmgc
 
 go 1.25.4
 
-toolchain go1.25.5
-
 require (
 	github.com/99designs/keyring v1.2.2
 	github.com/gotd/td v0.136.0
@@ -18,7 +16,7 @@ require (
 	github.com/coder/websocket v1.8.14 // indirect
 	github.com/danieljoos/wincred v1.1.2 // indirect
 	github.com/dlclark/regexp2 v1.11.5 // indirect
-	github.com/dvsekhvalnov/jose2go v1.7.0 // indirect
+	github.com/dvsekhvalnov/jose2go v1.5.0 // indirect
 	github.com/fatih/color v1.18.0 // indirect
 	github.com/ghodss/yaml v1.0.0 // indirect
 	github.com/go-faster/errors v0.7.1 // indirect
