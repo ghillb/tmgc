@@ -143,6 +143,26 @@ Output (JSON):
 }
 ```
 
+### `contact`
+
+```
+tmgc contact search <query> [--limit 20]
+```
+
+Searches synced contacts by display name or username (case-insensitive partial match).
+
+Output (JSON):
+
+```json
+[
+  {
+    "display_name": "Jane Doe",
+    "username": "@janedoe",
+    "user": "u123456"
+  }
+]
+```
+
 ### `search`
 
 ```
@@ -158,6 +178,7 @@ v0 is scoped to:
 - Auth (QR + code), status, logout
 - Chat list + history
 - Send text messages and files (auto-detect media vs document)
+- Contact search
 - Search messages (global or per chat)
 
 Non-goals for v0:
