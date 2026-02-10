@@ -28,6 +28,12 @@ title: Commands
 | `message send <peer> --file <path> --voice` | Send a voice note (audio/ogg opus recommended). |
 | `message send <peer> ... --schedule <when>` | Schedule a message (RFC3339 or unix seconds). |
 
+## Contacts
+
+| Command | Notes |
+| --- | --- |
+| `contact search <query>` | Search contacts by display name or username. Partial match, case-insensitive. |
+
 ## Search
 
 | Command | Notes |

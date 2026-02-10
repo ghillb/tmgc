@@ -7,6 +7,7 @@ Features:
 - Auth: `auth login` (QR + PNG fallback), `auth status`, `auth logout`
 - Credentials: `auth config set/show`
 - Chat: `chat list`, `chat history`
+- Contacts: `contact search` (by name or username)
 - Messaging: `message send` (text or `--file`)
 - Search: `search messages` (global or per chat)
 - Output: human, `--plain` (TSV), `--json`
@@ -29,6 +30,7 @@ tmgc message send @username "hello"
 tmgc message send @username --file ./photo.jpg --caption "hi"
 tmgc message send @username --file ./voice.ogg --voice
 tmgc message send @username "later" --schedule 2026-01-05T09:30:00Z
+tmgc contact search "jane"
 ```
 
 Env vars are only needed if you skip `auth config set`:
