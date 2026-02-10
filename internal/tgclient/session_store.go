@@ -27,7 +27,6 @@ func NewSessionStorage(cfg config.Config, paths config.Paths, printer *output.Pr
 	}
 
 	if store == sessionStoreFile {
-		warnUnencryptedSession(printer, paths.SessionPath)
 		return &session.FileStorage{Path: paths.SessionPath}
 	}
 
